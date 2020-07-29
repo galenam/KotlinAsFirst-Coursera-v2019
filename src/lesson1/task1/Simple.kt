@@ -45,9 +45,6 @@ fun quadraticRootProduct(a: Double, b: Double, c: Double): Double {
     return x1 * x2 // Результат
 }
 
-/**
- * Пример главной функции
- */
 fun main() {
     val x1x2 = quadraticRootProduct(1.0, 13.0, 42.0)
     println("Root product: $x1x2")
@@ -76,7 +73,12 @@ fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double = TODO()
  * Пользователь задает угол в градусах, минутах и секундах (например, 36 градусов 14 минут 35 секунд).
  * Вывести значение того же угла в радианах (например, 0.63256).
  */
-fun angleInRadian(deg: Int, min: Int, sec: Int): Double = TODO()
+fun angleInRadian(deg: Int, min: Int, sec: Int): Double {
+    val degInRad = deg.toDouble() * Math.PI / 180
+    val minInRad = min.toDouble() * Math.PI / 10800
+    val secInRad = sec.toDouble() * Math.PI / 648000
+    return degInRad + minInRad + secInRad
+}
 
 /**
  * Тривиальная
@@ -92,7 +94,18 @@ fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double = TODO()
  * Пользователь задает целое число, большее 100 (например, 3801).
  * Определить третью цифру справа в этом числе (в данном случае 8).
  */
-fun thirdDigit(number: Int): Int = TODO()
+fun thirdDigit(number: Int): Int
+{
+    val rem = number % 1000
+    return rem / 100
+}
+
+fun DivRem (number: Int) : Pair<Int, Int>
+{
+    val div = number /10
+    val rem = number % 10
+    return Pair(div, rem)
+}
 
 /**
  * Простая
