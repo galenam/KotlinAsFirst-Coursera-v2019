@@ -157,9 +157,9 @@ class Tests {
     @Test
     @Tag("Normal")
     fun collatzSteps() {
+        assertEquals(7, collatzSteps(3))
         assertEquals(0, collatzSteps(1))
         assertEquals(1, collatzSteps(2))
-        assertEquals(7, collatzSteps(3))
         assertEquals(5, collatzSteps(5))
         assertEquals(6, collatzSteps(10))
         assertEquals(7, collatzSteps(20))
@@ -173,11 +173,11 @@ class Tests {
     @Test
     @Tag("Normal")
     fun sin() {
-        assertEquals(0.0, sin(0.0, 1e-5), 1e-5)
-        assertEquals(1.0, sin(PI / 2.0, 1e-5), 1e-5)
-        assertEquals(0.0, sin(PI, 1e-5), 1e-5)
         assertEquals(-1.0, sin(3.0 * PI / 2.0, 1e-5), 1e-5)
         assertEquals(0.0, sin(100 * PI, 1e-5), 1e-5)
+        assertEquals(0.0, sin(PI, 1e-5), 1e-5)
+        assertEquals(1.0, sin(PI / 2.0, 1e-5), 1e-5)
+        assertEquals(0.0, sin(0.0, 1e-5), 1e-5)
         assertNotEquals(kotlin.math.sin(1.0), sin(1.0, 1.0))
         assertNotEquals(kotlin.math.sin(-0.5), sin(-0.5, 1.0))
     }
@@ -228,10 +228,10 @@ class Tests {
     @Test
     @Tag("Hard")
     fun squareSequenceDigit() {
+        assertEquals(6, squareSequenceDigit(12))
         assertEquals(1, squareSequenceDigit(1))
         assertEquals(4, squareSequenceDigit(2))
         assertEquals(5, squareSequenceDigit(7))
-        assertEquals(6, squareSequenceDigit(12))
         assertEquals(0, squareSequenceDigit(17))
         assertEquals(9, squareSequenceDigit(27))
     }
