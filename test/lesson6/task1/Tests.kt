@@ -71,11 +71,11 @@ class Tests {
     @Test
     @Tag("Normal")
     fun bestLongJump() {
+        assertEquals(-1, bestLongJump("700 + 700"))
+
         assertEquals(717, bestLongJump("706 % - 717 - 703"))
         assertEquals(-1, bestLongJump("% - - % -"))
         assertEquals(754, bestLongJump("700 717 707 % 754"))
-        assertEquals(-1, bestLongJump("700 + 700"))
-
     }
 
     @Test
@@ -98,6 +98,7 @@ class Tests {
         assertThrows(IllegalArgumentException::class.java) { plusMinus("4 - -2") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("44 - - 12") }
         assertThrows(IllegalArgumentException::class.java) { plusMinus("4 - + 12") }
+
     }
 
     @Test
@@ -149,5 +150,6 @@ class Tests {
         assertThrows(IllegalArgumentException::class.java) { computeDeviceCells(10, "===", 3) }
         assertThrows(IllegalArgumentException::class.java) { computeDeviceCells(10, "+>+>[+>", 3) }
         assertThrows(IllegalStateException::class.java) { computeDeviceCells(20, ">>>>>>>>>>>>>", 12) }
+
     }
 }

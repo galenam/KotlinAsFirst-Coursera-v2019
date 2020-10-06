@@ -2,6 +2,10 @@
 
 package lesson6.task1
 
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
+import kotlin.math.sign
+
 /**
  * Пример
  *
@@ -69,7 +73,33 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val data = str.split(" ")
+    if (data.size != 3) return ""
+    val day = data[0].toIntOrNull() ?: return ""
+    val monthStr = data[1]
+    var monthDays = monthes[monthStr] ?: return ""
+    val month = monthes.keys.toList().indexOf(monthStr) + 1
+    val year = data[2].toIntOrNull() ?: return ""
+    if (month == 2 && year % 4 == 0) monthDays += 1
+    if (day < 1 || day > monthDays) return ""
+    return String.format("%02d.%02d.%02d", day, month, year)
+}
+
+val monthes = mapOf(
+    "января" to 31,
+    "февраля" to 28,
+    "марта" to 31,
+    "апреля" to 30,
+    "мая" to 31,
+    "июня" to 30,
+    "июля" to 31,
+    "августа" to 31,
+    "сентября" to 30,
+    "октября" to 31,
+    "ноября" to 30,
+    "декабря" to 31
+)
 
 /**
  * Средняя
@@ -81,7 +111,29 @@ fun dateStrToDigit(str: String): String = TODO()
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val data = digital.split(".")
+    if (data.size != 3) return ""
+
+    val day = data[0].toIntOrNull() ?: return ""
+    if (day < 1 || day > 31) return ""
+
+    val monthInt = data[1].toIntOrNull() ?: return ""
+    if (monthInt < 1 || monthInt > 12) return ""
+
+    val year = data[2].toIntOrNull() ?: return ""
+    val monthesKeys = monthes.keys.toList()
+    if (monthesKeys.size > monthInt - 1) {
+        var daysInCurrentMonth = monthes[monthesKeys[monthInt - 1]] ?: return ""
+        if (year % 4 == 0 && monthInt == 2) {
+            daysInCurrentMonth++
+        }
+        if (day > daysInCurrentMonth) return ""
+    } else {
+        return ""
+    }
+    return String.format("%s %s %s", day, monthesKeys[monthInt - 1], year)
+}
 
 /**
  * Средняя
@@ -97,7 +149,61 @@ fun dateDigitToStr(digital: String): String = TODO()
  *
  * PS: Дополнительные примеры работы функции можно посмотреть в соответствующих тестах.
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String {
+    val sBuilder = StringBuilder()
+    var i = 0
+    while (i < phone.length) {
+        if (phone[i] == '+') {
+            if (i == 0) {
+                sBuilder.append(phone[i])
+                i++
+                continue
+            } else {
+                return ""
+            }
+        }
+
+        if (!isOkInnerPhoneString(phone[i], sBuilder)) {
+            return ""
+        }
+
+        if (phone[i] == '(') {
+            var j = i + 1
+            val correctLength = sBuilder.length
+            while (j < phone.length) {
+                if (!isOkInnerPhoneString(phone[j], sBuilder)) {
+                    return ""
+                }
+                if (phone[j] == ')') {
+                    if (correctLength - sBuilder.length == 0) {
+                        return ""
+                    } else {
+                        break
+                    }
+                }
+                j++
+            }
+            i = j
+        }
+        i++
+    }
+    return sBuilder.toString()
+}
+
+fun isOkInnerPhoneString(ch: Char, sBuilder: StringBuilder): Boolean {
+    if (Regex("\\d").containsMatchIn(ch.toString())) {
+        sBuilder.append(ch)
+        return true
+    }
+    if (ch == ' ' || ch == '-') {
+        return true
+    }
+    if (ch != '(' && ch != ')') {
+        return false
+    }
+    return true
+}
+
 
 /**
  * Средняя
@@ -109,7 +215,31 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    var i = 0
+    val digitInStrings = mutableListOf<String>()
+    while (i < jumps.length) {
+        if (jumps[i] != ' ' && jumps[i] != '%' && jumps[i] != '-' && (jumps[i] < '0' || jumps[i] > '9')) {
+            return -1
+        }
+        if (jumps[i] in '0'..'9') {
+            val sBuilder = StringBuilder()
+            while (i < jumps.length && jumps[i] in '0'..'9') {
+                sBuilder.append(jumps[i])
+                i++
+            }
+            digitInStrings.add(sBuilder.toString())
+        } else {
+            i++
+        }
+    }
+    var max = -1
+    for (digitStr in digitInStrings) {
+        val value = digitStr.toInt()
+        if (max < value) max = value
+    }
+    return max
+}
 
 /**
  * Сложная
@@ -122,7 +252,42 @@ fun bestLongJump(jumps: String): Int = TODO()
  * При нарушении формата входной строки, а также в случае отсутствия удачных попыток,
  * вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    var i = 0
+    val digitInStrings = mutableListOf<String>()
+    while (i < jumps.length) {
+        if (jumps[i] != ' ' && jumps[i] != '%' && jumps[i] != '-' && jumps[i] != '+' && (jumps[i] < '0' || jumps[i] > '9')) {
+            return -1
+        }
+        if (jumps[i] in '0'..'9') {
+            val sBuilder = StringBuilder()
+            while (i < jumps.length && jumps[i] in '0'..'9') {
+                sBuilder.append(jumps[i])
+                i++
+            }
+            while (i < jumps.length) {
+                if (jumps[i] == '%') {
+                    i++
+                    break
+                }
+                if (jumps[i] == '+') {
+                    digitInStrings.add(sBuilder.toString())
+                    i++
+                    break
+                }
+                i++
+            }
+        } else {
+            i++
+        }
+    }
+    var max = -1
+    for (digitStr in digitInStrings) {
+        val value = digitStr.toInt()
+        if (max < value) max = value
+    }
+    return max
+}
 
 /**
  * Сложная
@@ -133,7 +298,43 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    val data = expression.split(" ")
+    if (data.isEmpty()) {
+        throw IllegalArgumentException()
+    }
+    if (!Regex("^\\d+$").containsMatchIn(data[0])) {
+        throw IllegalArgumentException()
+    }
+    var result = 0
+    var sign = true
+    for (i in data.indices) {
+        if (i % 2 == 1) {
+            sign = when {
+                data[i] == "+" -> {
+                    true
+                }
+                data[i] == "-" -> {
+                    false
+                }
+                else -> {
+                    throw IllegalArgumentException()
+                }
+            }
+        } else {
+            if (!Regex("^\\d+$").containsMatchIn(data[i])) {
+                throw IllegalArgumentException()
+            }
+            val value = data[i].toIntOrNull() ?: throw IllegalArgumentException()
+            if (sign) {
+                result += value
+            } else {
+                result -= value
+            }
+        }
+    }
+    return result
+}
 
 /**
  * Сложная
@@ -144,7 +345,27 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    var i = 0
+    val map = mutableMapOf<String, Int>()
+    while (i < str.length) {
+        val sBuilder = StringBuilder()
+        while (i < str.length && str[i] != ' ') {
+            sBuilder.append(str[i])
+            i++
+        }
+        i++
+        val data = sBuilder.toString().toLowerCase()
+        if (map.containsKey(data)) {
+            val index = map[data]!!
+            if (i - 1 - data.length == index + 1 + data.length) {
+                return map[data]!!
+            }
+        }
+        map[data] = i - 1 - data.length
+    }
+    return -1
+}
 
 /**
  * Сложная
@@ -157,7 +378,18 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    val data = description.split(";")
+    val map = mutableMapOf<String, Double>()
+    for (namePrice in data) {
+        var pair = namePrice.trim().split(" ")
+        if (pair.isEmpty() || pair.size != 2) {
+            return ""
+        }
+        map[pair[0]] = pair[1].toDoubleOrNull() ?: return ""
+    }
+    return map.maxBy{ it.value }?.key ?: ""
+}
 
 /**
  * Сложная
@@ -170,7 +402,26 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    val map = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
+    var i = 0
+    var result = 0
+    while (i < roman.length) {
+        val cur = map[roman[i]] ?: return -1
+        if (i + 1 < roman.length) {
+            val next = map[roman[i + 1]] ?: return -1
+            if (cur < next) {
+                result -= cur
+            } else {
+                result += cur
+            }
+        } else {
+            result += cur
+        }
+        i++
+    }
+    return result
+}
 
 /**
  * Очень сложная
@@ -208,4 +459,112 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    var isOpen = 0
+    for (ch in commands) {
+        if (ch != '>' && ch != '<' && ch != '>' && ch != '+' && ch != '-' && ch != '[' && ch != ']' && ch != ' ') {
+            throw IllegalArgumentException()
+        }
+        if (ch == ']') {
+            if (isOpen > 0) {
+                isOpen--
+            } else {
+                throw IllegalArgumentException()
+            }
+        }
+        if (ch == '[') {
+            isOpen++
+        }
+    }
+    if (isOpen != 0) {
+        throw IllegalArgumentException()
+    }
+    val result = MutableList(cells) { 0 }
+    var i = cells / 2
+    var j = 0
+    var countCommands = 0
+    while (j < commands.length && countCommands < limit) {
+        if (i >= result.size || i < 0) {
+            throw IllegalStateException()
+        }
+        countCommands++
+
+        if (commands[j] == ' ') {
+            j++
+            continue
+        }
+
+        if (commands[j] == '>') {
+            i++
+            j++
+            continue
+        }
+
+        if (commands[j] == '<') {
+            i--
+            j++
+            continue
+        }
+
+        if (commands[j] == '+') {
+            result[i]++
+            j++
+            continue
+        }
+
+        if (commands[j] == '-') {
+            result[i]--
+            j++
+            continue
+        }
+
+        if (commands[j] == '[') {
+            if (result[i] == 0) {
+                var nesting = 0
+                while (j < commands.length) {
+                    j++
+                    if (commands[j] == '[') {
+                        nesting++
+                    }
+                    if (commands[j] == ']') {
+                        if (nesting > 0) {
+                            nesting--
+                        } else {
+                            j++
+                            break
+                        }
+                    }
+                }
+                continue
+            } else {
+                j++
+                continue
+            }
+        }
+
+        if (commands[j] == ']') {
+            if (result[i] != 0) {
+                var nesting = 0
+                while (j >= 0) {
+                    j--
+                    if (commands[j] == ']') {
+                        nesting++
+                    }
+                    if (commands[j] == '[') {
+                        if (nesting > 0) {
+                            nesting--
+                        } else {
+                            j++
+                            break
+                        }
+                    }
+                }
+                continue
+            } else {
+                j++
+                continue
+            }
+        }
+    }
+    return result
+}
